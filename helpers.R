@@ -67,8 +67,11 @@ create_network <- function(n_agents, n_techs, topology){
 #' @param intrinsic_preference
 #' @param intrinsic_utilities
 #' @param choice_mode
+#' @param print_decisions If TRUE, print decisions of each agent
 #' @return The chosen technology
-choose_tech <- function(graph_used, vertex_used, all_techs, intrinsic_preference, intrinsic_utilities, choice_mode="share"){
+choose_tech <- function(graph_used, vertex_used, all_techs, 
+                        intrinsic_preference, intrinsic_utilities, 
+                        choice_mode="share", print_decisions=FALSE){
   neighborhood <- neighbors(graph_used, vertex_used)
   techs_neighborhood <- factor(
     neighborhood$technology[!is.na(neighborhood$technology)], 
@@ -91,8 +94,10 @@ choose_tech <- function(graph_used, vertex_used, all_techs, intrinsic_preference
     }
     tech_chosen <- all_techs[index_max]
   }
-  print(paste0("V", vertex_used, " chose tech ", tech_chosen, 
-               " (oriented on ", neighborhood_len, " neighbors)"))
+  if (print_decisions){
+    print(paste0("V", vertex_used, " chose tech ", tech_chosen, 
+                 " (oriented on ", neighborhood_len, " neighbors)"))
+  }
   return(tech_chosen)
 }
 
@@ -204,8 +209,9 @@ make_single_simul_dynamics <- function(simul_id, result_frame){
     dplyr::filter(interaction_id==simul_id) %>%
     ggplot(data = ., mapping = aes(x=time, y=share, color=tech)) +
     geom_line() + geom_point(alpha=.5) +
-    xlab("Zeit") + ylab("Nutzer*innenanteil") +
-    scale_y_continuous(labels = scales::percent_format()) +
+    xlab("Zeit") +
+    scale_y_continuous(labels = scales::percent_format(), limits = c(0, 1),
+                       name="Nutzer*innenanteil") +
     scale_color_manual(values=wes_palette(
       name = "Darjeeling1", n = n_tech, type = "continuous"), 
       labels=c(1:n_tech), name="Technologie") +
@@ -241,7 +247,7 @@ plot_dynamics_dom_tech <- function(simul_data){
                                    color=as.factor(interaction_id))) +
     geom_line() + geom_point(alpha=.5) +
     xlab("Zeit") + ylab("Nutzer*innenanteil") +
-    scale_y_continuous(labels = scales::percent_format()) +
+    scale_y_continuous(labels = scales::percent_format(), limits = c(0, 1)) +
     scale_color_manual(values=wes_palette(
       name = "Darjeeling1", n = length(runs), type = "continuous")
     ) +
@@ -251,3 +257,49 @@ plot_dynamics_dom_tech <- function(simul_data){
           axis.line = element_line(), 
           legend.position = "none")
 }
+
+#' Visualizes the final shares in the simulation
+#' 
+#' @param simul_results The simulation results as produced by 
+#'  \code{run_n_simulations}
+#' @param kind Either 'normal' or 'ranked'. In the former case, results for 
+#'  the different technologies as such as are presented. Otherwise, techs
+#'  are ranked and grouped by rank, i.e. shares for the techs with highest 
+#'  share etc. are shows
+#' @return A ggplot2 object
+make_final_shares <- function(simul_results, kind="normal"){# "ranked
+  if (kind=="normal"){
+    title_used <- "Nutzer*innen je Technologie"
+    y_name_used <- "Technologie"
+    plot_results <- simul_results %>%
+      dplyr::filter(time==max(simul_results$time))
+  } else if (kind=="ranked"){
+    title_used <- "Nutzer*innen nach gerankten Technologien"
+    y_name_used <- "Technologie (Rang)"
+    
+    
+    plot_results <- simul_results %>% 
+      dplyr::filter(time==max(simul_results$time)) %>%
+      group_by(interaction_id) %>%
+      dplyr::mutate(tech=rank(-share, ties.method = "min"))
+  } else {
+    stop(paste("Wrong kind used; allowed: 'normal' or 'ranked', not", kind))
+  }
+  ggplot(plot_results, aes(x=as.factor(tech), y=as.double(share),
+                           fill=as.factor(tech))) +
+    geom_boxplot(alpha=0.75) +
+    stat_summary(fun=mean, geom="point", 
+                 shape=20, size=10, alpha=0.5, 
+                 color="black", fill="black") +
+    ggtitle(title_used) +
+    scale_y_continuous(labels = scales::percent_format(), limits = c(0, 1),
+                       name=TeX("Populationsanteil nach $t_{max}$")) +
+    scale_x_discrete(
+      labels=as.character(1:length(unique(simul_results$tech))), 
+      name=y_name_used) +
+    scale_fill_brewer(palette="Set1") + 
+    theme_bw() +
+    theme(panel.border = element_blank(), 
+          axis.line = element_line(), 
+          legend.position = "none")
+} 
