@@ -216,4 +216,38 @@ make_single_simul_dynamics <- function(simul_id, result_frame){
           legend.position = "bottom")
 }
 
-
+#' Visualizes the dynamics of the technologies with highest final usage shares
+#' 
+#' @param simul_data The simulation results as produced by 
+#'  \code{run_n_simulations}
+#' @return A ggplot2 object
+plot_dynamics_dom_tech <- function(simul_data){
+  max_techs <- simul_data %>% 
+    dplyr::filter(time==max(simul_data$time)) %>%
+    group_by(interaction_id) %>%
+    dplyr::filter(share==max(share))
+  
+  runs <- max_techs$interaction_id
+  run_max_tech <- max_techs$tech
+  rel_techs <- list()
+  for (r in 1:length(runs)){
+    rel_techs[[r]] <- simul_data %>%
+      dplyr::filter(interaction_id==runs[r],
+                    tech==run_max_tech[r])
+  }
+  
+  dplyr::bind_rows(rel_techs) %>%
+    ggplot(data = ., mapping = aes(x=time, y=share, 
+                                   color=as.factor(interaction_id))) +
+    geom_line() + geom_point(alpha=.5) +
+    xlab("Zeit") + ylab("Nutzer*innenanteil") +
+    scale_y_continuous(labels = scales::percent_format()) +
+    scale_color_manual(values=wes_palette(
+      name = "Darjeeling1", n = length(runs), type = "continuous")
+    ) +
+    ggtitle(paste0("Nutzer*innenanteile der weitverbreitesten Technologien")) +
+    theme_bw() +
+    theme(panel.border = element_blank(), 
+          axis.line = element_line(), 
+          legend.position = "none")
+}
