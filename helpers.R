@@ -1,3 +1,5 @@
+# General helper functions-----------------------------------------------------
+
 #' Adjust nb of agents to allow for equally sized technology groups
 #' 
 #' Adjusts the number of agents in the network one cannot form equally sized 
@@ -19,6 +21,8 @@ adj_n <- function(n_agents, n_techs){
   stopifnot(n_new%%n_techs==0)
   return(n_new)
 }
+
+# Simulation-specific helpers--------------------------------------------------
 
 #' Create a network with agents
 #' 
@@ -185,4 +189,31 @@ run_n_simulations <- function(n_iterations, n_agents, n_techs,
   }
   return(dplyr::bind_rows(result_frames))
 }
+
+# Visualization functions------------------------------------------------------
+
+#' Visualizes the dynamics of shares in a single simulation run
+#' 
+#' @param simul_id The id of the simulation run
+#' @param result_frame The result frame as produced by \code{run_n_simulations}
+#'  or \code{run_simulation}
+#' @return A ggplot object
+make_single_simul_dynamics <- function(simul_id, result_frame){
+  n_tech <- length(unique(result_frame$tech))
+  result_frame %>%
+    dplyr::filter(interaction_id==simul_id) %>%
+    ggplot(data = ., mapping = aes(x=time, y=share, color=tech)) +
+    geom_line() + geom_point(alpha=.5) +
+    xlab("Zeit") + ylab("Nutzer*innenanteil") +
+    scale_y_continuous(labels = scales::percent_format()) +
+    scale_color_manual(values=wes_palette(
+      name = "Darjeeling1", n = n_tech, type = "continuous"), 
+      labels=c(1:n_tech), name="Technologie") +
+    ggtitle(paste0("Nutzer*innenanteile (Simulation ", simul_id, ")")) +
+    theme_bw() +
+    theme(panel.border = element_blank(), 
+          axis.line = element_line(), 
+          legend.position = "bottom")
+}
+
 
