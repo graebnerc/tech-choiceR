@@ -1,6 +1,8 @@
 library(shiny)
 library(ggplot2)
 library(igraph)
+col_blue <- "#004c93"
+col_light_blue <- "#dfe4f2"
 # library(magrittr)
 # library(ggpubr)
 # source("helpers.R")
@@ -61,7 +63,8 @@ ui <- fluidPage(
                        selected = "Anteile")
     ),
     column(3,
-           h3("Netzwerkstruktur Fall 1")#, plotOutput("network_1")
+           h3("Netzwerkstruktur Fall 1"),
+           plotOutput("network_1")
     ),
     column(3,
            h3("Adaptionsdynamiken Fall 1")#, plotOutput("adaption_1")
@@ -86,7 +89,37 @@ ui <- fluidPage(
 
 
 server <- function(input, output) {
-# The network figures
+  # Create the network
+
+  
+  output$network_1 <- renderPlot({
+    network_topology_1 <- input$network_topology_1
+    n_agents <- input$n_agents
+    
+    if (network_topology_1=="Komplettes Netzwerk"){
+      network_used <- make_full_graph(
+        n_agents, directed = FALSE, loops = FALSE)
+      plot_layout <- layout.kamada.kawai(network_used)
+      e_col <- adjustcolor("grey", alpha.f = .25)
+    } else if (network_topology_1=="Ring"){
+      network_used <- make_ring(
+        n_agents, directed = FALSE, mutual = FALSE, circular = TRUE)
+      plot_layout <- layout_in_circle(network_used)
+      e_col <- adjustcolor("grey", alpha.f = .95)
+    } else {
+      stop("No correct network topology given!")
+    }
+    
+    plot(network_used, 
+         edge.color=e_col,
+         edge.arrow.size=1.2, 
+         edge.curved=.0, 
+         vertex.label=NA,
+         vertex.size=8,
+         vertex.color=col_blue,
+         layout = plot_layout, xaxs="i", yaxs="i")
+    
+  })
 }
 
 
