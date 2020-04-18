@@ -84,6 +84,9 @@ choose_tech <- function(graph_used, vertex_used, all_techs,
     rel_freqs <- prop.table(abs_freqs)
     if (choice_mode=="share"){
       utilities <- unname(rel_freqs)
+      if (length(utilities)!=length(intrinsic_utilities)){
+        browser()
+      }
       stopifnot(length(utilities)==length(intrinsic_utilities))
       utilities <- utilities + intrinsic_utilities
       utilities[V(graph_used)[vertex_used]$preferred_tech] <- utilities[V(graph_used)[vertex_used]$preferred_tech] + intrinsic_preference
@@ -207,7 +210,8 @@ make_single_simul_dynamics <- function(simul_id, result_frame){
   n_tech <- length(unique(result_frame$tech))
   result_frame %>%
     dplyr::filter(interaction_id==simul_id) %>%
-    ggplot(data = ., mapping = aes(x=time, y=share, color=tech)) +
+    ggplot(data = ., mapping = aes(x=time, y=share, color=tech, 
+                                   linetype=tech, shape=tech)) +
     geom_line() + geom_point(alpha=.5) +
     xlab("Zeit") +
     scale_y_continuous(labels = scales::percent_format(), limits = c(0, 1),
@@ -215,6 +219,7 @@ make_single_simul_dynamics <- function(simul_id, result_frame){
     scale_color_manual(values=wes_palette(
       name = "Darjeeling1", n = n_tech, type = "continuous"), 
       labels=c(1:n_tech), name="Technologie") +
+    guides(linetype="none", shape="none") +
     ggtitle(paste0("Nutzer*innenanteile (Simulation ", simul_id, ")")) +
     theme_bw() +
     theme(panel.border = element_blank(), 

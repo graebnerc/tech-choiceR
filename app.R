@@ -1,8 +1,20 @@
 library(shiny)
-library(ggplot2)
+library(tidyverse)
 library(igraph)
+
+library(scales)
+library(Hmisc)
+library(wesanderson)
+library(latex2exp)
+
+
+source("helpers.R")
 col_blue <- "#004c93"
 col_light_blue <- "#dfe4f2"
+decision_kind_dict <- list(
+  "Anteile"="share",
+  "Absolute Nutzer*innenzahl"="absolute"
+)
 # library(magrittr)
 # library(ggpubr)
 # source("helpers.R")
@@ -15,11 +27,14 @@ ui <- fluidPage(
   fluidRow(
     column(3,
            h3("Grundeinstellungen"),
+           sliderInput("simulation_iterations", 
+                       label='Anzahl der Simulationsiterationen',
+                       min = 2, max = 100, step=1, value = 10),
            sliderInput("n_agents", 
                        label='Anzahl der Agenten \\( N \\)',
                        min = 2, max = 100, step=1, value = 50),
-           numericInput("n_techs", label = h3("Anzahl Technologien"), 
-                        value = 1, min = 2, max = 5, step = 1),
+           numericInput("n_techs", label = "Anzahl Technologien", 
+                        value = 2, min = 2, max = 5, step = 1),
            h4("Technologieeigenschaften"),
            sliderInput("int_util", 
                        label='Gruppenbezogene Technologiepräferenz',
@@ -50,26 +65,44 @@ ui <- fluidPage(
            )
   ),
     column(3, 
-           h3("Einstellungen Fall 1"),
-           selectInput("decision_kind_1", 
+           h3("Fallspezifische Einstellungen"),
+           selectInput("decision_kind", 
                        label = "Art der Technologiewahl",
-                       choices = c("Anteile", 
-                                   "Absolute Nutzer*innenzahl"),
+                       choices = c("Anteile"#, "Absolute Nutzer*innenzahl"
+                                   ),
                        selected = "Anteile"),
-           selectInput("network_topology_1", 
+           selectInput("network_topology", 
                        label = "Netzwerktopologie Fall 1",
                        choices = c("Komplettes Netzwerk", 
                                    "Ring"), # Barabasi, Small World; dann mit optionalem panel
                        selected = "Anteile")
     ),
     column(3,
-           h3("Netzwerkstruktur Fall 1"),
+           h3("Netzwerktopologie"),
            plotOutput("network_1")
     ),
     column(3,
-           h3("Adaptionsdynamiken Fall 1")#, plotOutput("adaption_1")
+           h3("Einzelne Adaptionsdynamiken"),
+           numericInput("single_adapt_case", label = "Iteration", 
+                        min = 2, max = 100, step=1, value = 1),
+           plotOutput("single_adaption")
     )
   ),
+  fluidRow(
+    column(3),
+    column(3,
+           h3("Dynamik der dominanten Technologien"),
+           plotOutput("dyn_dom_tech")
+           ),
+    column(3,
+           h3("Finale Anteile der einzelnen Technologien"),
+           plotOutput("final_shares_normal")
+    ),
+    column(3,
+           h3("Finale Anteile der nach Anteilen gerankten Technologien"),
+           plotOutput("final_shares_ranked")
+    )
+    ),
   fluidRow(
     column(3),
     column(9,
@@ -89,27 +122,18 @@ ui <- fluidPage(
 
 
 server <- function(input, output) {
-  # Create the network
-
-  
+  # Network plot
   output$network_1 <- renderPlot({
-    network_topology_1 <- input$network_topology_1
-    n_agents <- input$n_agents
-    
-    if (network_topology_1=="Komplettes Netzwerk"){
-      network_used <- make_full_graph(
-        n_agents, directed = FALSE, loops = FALSE)
-      plot_layout <- layout.kamada.kawai(network_used)
+    network_used <- create_network(input$n_agents, 
+                                   input$n_techs, 
+                                   input$network_topology)
+    if (input$network_topology=="Komplettes Netzwerk"){
       e_col <- adjustcolor("grey", alpha.f = .25)
-    } else if (network_topology_1=="Ring"){
-      network_used <- make_ring(
-        n_agents, directed = FALSE, mutual = FALSE, circular = TRUE)
+      plot_layout <- layout.kamada.kawai(network_used)
+    } else if (input$network_topology=="Ring"){
+      e_col <- adjustcolor("grey", alpha.f = .75)
       plot_layout <- layout_in_circle(network_used)
-      e_col <- adjustcolor("grey", alpha.f = .95)
-    } else {
-      stop("No correct network topology given!")
-    }
-    
+    } 
     plot(network_used, 
          edge.color=e_col,
          edge.arrow.size=1.2, 
@@ -120,6 +144,49 @@ server <- function(input, output) {
          layout = plot_layout, xaxs="i", yaxs="i")
     
   })
+  
+  simul_results <- reactive({
+    if (input$n_techs == 2){
+      intrinsic_utilities <- c(input$int_util_1, input$int_util_2)
+    } else if (input$n_techs == 3){
+      intrinsic_utilities <- c(input$int_util_1, input$int_util_2, 
+                               input$int_util_3)
+    }else if (input$n_techs == 4){
+      intrinsic_utilities <- c(input$int_util_1, input$int_util_2, 
+                               input$int_util_3, input$int_util_4)
+    } else {
+      intrinsic_utilities <- c(input$int_util_1, input$int_util_2, 
+                               input$int_util_3, input$int_util_4, 
+                               input$int_util_5)
+    }
+
+    run_n_simulations(
+      n_iterations=input$simulation_iterations, 
+      n_agents=input$n_agents, 
+      n_techs=input$n_techs, 
+      network_topology=input$network_topology, 
+      choose_mode=decision_kind_dict[[input$decision_kind]], 
+      intrinsic_preference=input$int_util, 
+      intrinsic_utilities=intrinsic_utilities)
+  })
+  
+  output$single_adaption <- renderPlot({
+    make_single_simul_dynamics(as.double(input$single_adapt_case), 
+                               simul_results())
+  })
+  
+  output$dyn_dom_tech <- renderPlot({
+    plot_dynamics_dom_tech(simul_results())
+  })
+  
+  output$final_shares_normal <- renderPlot({
+    make_final_shares(simul_results(), kind = "normal")
+  })
+  
+  output$final_shares_ranked <- renderPlot({
+    make_final_shares(simul_results(), kind = "ranked")
+  })
+  
 }
 
 
