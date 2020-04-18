@@ -21,32 +21,32 @@ ui <- fluidPage(
            numericInput("n_techs", label = h3("Anzahl Technologien"), 
                         value = 1, min = 2, max = 5, step = 1),
            h4("Technologieeigenschaften"),
-           sliderInput("int_util_1", 
-                       label='Intrinsischer Nutzen von \\( T_1 \\)',
+           sliderInput("int_util", 
+                       label='Gruppenbezogene Technologiepräferenz',
                        min = 0.0, max = 1.0, step=0.05, value = 0.5),
            sliderInput("int_util_1", 
-                label='Intrinsischer Nutzen von \\( T_1 \\)',
-                min = 0.0, max = 1.0, step=0.05, value = 0.5),
+                label='Spezieller intrinsischer Nutzen von \\( T_1 \\)',
+                min = 0.0, max = 1.0, step=0.05, value = 0.0),
            sliderInput("int_util_2", 
-                       label='Intrinsischer Nutzen von \\( T_2 \\)',
-                       min = 0.0, max = 1.0, step=0.05, value = 0.5),
+                       label='Spezieller intrinsischer Nutzen von \\( T_2 \\)',
+                       min = 0.0, max = 1.0, step=0.05, value = 0.0),
            conditionalPanel(
              condition = "input.n_techs>2",
              sliderInput("int_util_3", 
-                         label='Intrinsischer Nutzen von \\( T_3 \\)',
-                         min = 0.0, max = 1.0, step=0.05, value = 0.5)
+                         label='Spezieller intrinsischer Nutzen von \\( T_3 \\)',
+                         min = 0.0, max = 1.0, step=0.05, value = 0.0)
              ),
            conditionalPanel(
              condition = "input.n_techs>3",
              sliderInput("int_util_4", 
-                         label='Intrinsischer Nutzen von \\( T_4 \\)',
-                         min = 0.0, max = 1.0, step=0.05, value = 0.5)
+                         label='Spezieller intrinsischer Nutzen von \\( T_4 \\)',
+                         min = 0.0, max = 1.0, step=0.05, value = 0.0)
            ),
            conditionalPanel(
              condition = "input.n_techs>4",
              sliderInput("int_util_5", 
-                         label='Intrinsischer Nutzen von \\( T_5 \\)',
-                         min = 0.0, max = 1.0, step=0.05, value = 0.5)
+                         label='Spezieller intrinsischer Nutzen von \\( T_5 \\)',
+                         min = 0.0, max = 1.0, step=0.05, value = 0.0)
            )
   ),
     column(3, 
