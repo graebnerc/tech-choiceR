@@ -1,12 +1,12 @@
 library(shiny)
 library(tidyverse)
 library(igraph)
-
 library(scales)
 library(Hmisc)
 library(wesanderson)
 library(latex2exp)
-
+library(magrittr)
+library(ggpubr)
 
 source("helpers.R")
 col_blue <- "#004c93"
@@ -15,8 +15,13 @@ decision_kind_dict <- list(
   "Anteile"="share",
   "Absolute Nutzer*innenzahl"="absolute"
 )
-# library(magrittr)
-# library(ggpubr)
+topology_dict <- list(
+  "Komplettes Netzwerk"="vollst_netw",
+  "Ring"="ring_netw",
+  "Barabasi-Albert"="BA_netw",
+  "Small-World", "smw_netw"
+)
+
 # source("helpers.R")
 # p_range <- seq(0, 10, 0.1)
 # t_input <- seq(0, 40)
@@ -110,7 +115,8 @@ ui <- fluidPage(
   fluidRow(
     column(3),
     column(9,
-           #downloadButton("downloadPlot", "Download der Abbildungen im PDF Format"),
+           downloadButton("downloadPlot", 
+                          "Download der Abbildungen c-f im PDF Format"),
            h3("Beschreibung des Modells"),
            p("Eine genaue Beschreibung des Modelles und der Implementierung in R finden Sie im Begleitdokument (Moodle oder auf Github im Ordner 'beschreibung')."),
            p("Agenten wählen nacheinander eine Technologie. Bei der Wahl berücksichtigen Sie ihre persönliche Präferenz und den Netzwerknutzen, also die aktuelle Verbreitung der Technologie in ihrer Nachbarschascht. Diese wird durch die Netzwerktopologie bestimmmt. Im vollständigen Netzwerk wird die Verbreitung der Technologie in der gesamten Population berücksichtigt. Dies stellt die implizite Annahme in vielen Modellen dar."),
@@ -239,6 +245,24 @@ server <- function(input, output) {
   output$final_shares_ranked <- renderPlot({
     make_final_shares(simul_results()[["data"]], kind = "ranked")
   })
+  
+  output$downloadPlot <- downloadHandler(
+    filename = function() {
+      paste("tech_choice_", topology_dict[[input$network_topology]],
+            ".pdf", sep = "")
+    },
+    content = function(file) {
+      full_plot <- ggarrange(
+        make_single_simul_dynamics(as.double(input$single_adapt_case),
+                                   simul_results()[["data"]]),
+        plot_dynamics_dom_tech(simul_results()[["data"]]),
+        make_final_shares(simul_results()[["data"]], kind = "normal"),
+        make_final_shares(simul_results()[["data"]], kind = "ranked"),
+        ncol = 2, nrow = 2, font.label = list(face="bold"))
+      plot_width <- 9
+      ggsave(file, plot = full_plot, width = plot_width, height = 8)
+    }
+  )
   
 }
 
