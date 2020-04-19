@@ -42,6 +42,14 @@ create_network <- function(n_agents, n_techs, topology){
       n_agents, directed = FALSE, mutual = FALSE, circular = TRUE)
     plot_layout <- layout_in_circle(network_used)
     
+  } else if(topology=="Barabasi-Albert"){
+    network_used <- sample_pa(
+      n_agents, power = 1.2, m = 2, directed = FALSE, algorithm = "psumtree")
+    plot_layout <- layout.graphopt(network_used) 
+  } else if(topology=="Small-World"){
+    network_used <- simplify(sample_smallworld(dim = 1, size = n_agents, 
+                                               nei = 1, p = 0.1))
+    plot_layout <- layout_in_circle(network_used) 
   } else {
     stop("No correct network topology given!")
   }

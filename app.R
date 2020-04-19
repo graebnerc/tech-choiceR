@@ -49,8 +49,10 @@ ui <- fluidPage(
            selectInput("network_topology", 
                        label = "Netzwerktopologie",
                        choices = c("Komplettes Netzwerk", 
-                                   "Ring"), # Barabasi, Small World; dann mit optionalem panel
-                       selected = "Anteile"),
+                                   "Ring", 
+                                   "Barabasi-Albert", 
+                                   "Small-World"),
+                       selected = "Komplettes Netzwerk"),
            h4("Technologieeigenschaften"),
            sliderInput("int_util", 
                        label='Gruppenbezogene Technologiepräferenz',
@@ -163,16 +165,20 @@ ui <- fluidPage(
 server <- function(input, output) {
   # Network plot
   output$network_1 <- renderPlot({
-    network_used <- create_network(input$n_agents, 
-                                   input$n_techs, 
-                                   input$network_topology)
+    network_used <- simul_results()[["networks"]][[input$single_adapt_case_netw]]
     if (input$network_topology=="Komplettes Netzwerk"){
       e_col <- adjustcolor("grey", alpha.f = .25)
       plot_layout <- layout.kamada.kawai(network_used)
     } else if (input$network_topology=="Ring"){
       e_col <- adjustcolor("grey", alpha.f = .75)
       plot_layout <- layout_in_circle(network_used)
-    } 
+    } else if (input$network_topology=="Barabasi-Albert"){
+      e_col <- adjustcolor("grey", alpha.f = .75)
+      plot_layout <- layout.graphopt(network_used)
+    } else if(network_topology_1=="Small-World"){
+      e_col <- adjustcolor("grey", alpha.f = .75)
+      plot_layout <- layout_in_circle(network_used) 
+    }
     plot(network_used, 
          edge.color=e_col,
          edge.arrow.size=1.2, 
@@ -192,7 +198,13 @@ server <- function(input, output) {
     } else if (input$network_topology=="Ring"){
       e_col <- adjustcolor("grey", alpha.f = .75)
       plot_layout <- layout_in_circle(network_used)
-    } 
+    } else if (input$network_topology=="Barabasi-Albert"){
+      e_col <- adjustcolor("grey", alpha.f = .75)
+      plot_layout <- layout.graphopt(network_used)
+    } else if(network_topology_1=="Small-World"){
+      e_col <- adjustcolor("grey", alpha.f = .75)
+      plot_layout <- layout_in_circle(network_used) 
+    }
     plot(network_used, 
          edge.color=e_col,
          edge.arrow.size=1.2, 
