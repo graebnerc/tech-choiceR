@@ -286,7 +286,7 @@ make_final_shares <- function(simul_results, kind="normal"){# "ranked
     plot_results <- simul_results %>% 
       dplyr::filter(time==max(simul_results$time)) %>%
       group_by(interaction_id) %>%
-      dplyr::mutate(tech=rank(-share, ties.method = "min"))
+      dplyr::mutate(tech=rank(-share, ties.method = "first"))
   } else {
     stop(paste("Wrong kind used; allowed: 'normal' or 'ranked', not", kind))
   }

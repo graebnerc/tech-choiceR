@@ -78,11 +78,11 @@ ui <- fluidPage(
                        selected = "Anteile")
     ),
     column(3,
-           h3("Netzwerktopologie"),
+           h3("a) Netzwerktopologie"),
            plotOutput("network_1")
     ),
     column(3,
-           h3("Einzelne Adaptionsdynamiken"),
+           h3("b) Einzelne Adaptionsdynamiken"),
            numericInput("single_adapt_case", label = "Iteration", 
                         min = 2, max = 100, step=1, value = 1),
            plotOutput("single_adaption")
@@ -91,15 +91,15 @@ ui <- fluidPage(
   fluidRow(
     column(3),
     column(3,
-           h3("Dynamik der dominanten Technologien"),
+           h3("c) Dynamik der dominanten Technologien"),
            plotOutput("dyn_dom_tech")
            ),
     column(3,
-           h3("Finale Anteile der einzelnen Technologien"),
+           h3("d) Finale Anteile der einzelnen Technologien"),
            plotOutput("final_shares_normal")
     ),
     column(3,
-           h3("Finale Anteile der nach Anteilen gerankten Technologien"),
+           h3("e) Finale Anteile der nach Anteilen gerankten Technologien"),
            plotOutput("final_shares_ranked")
     )
     ),
