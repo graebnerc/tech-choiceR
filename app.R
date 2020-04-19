@@ -22,10 +22,6 @@ topology_dict <- list(
   "Small-World", "smw_netw"
 )
 
-# source("helpers.R")
-# p_range <- seq(0, 10, 0.1)
-# t_input <- seq(0, 40)
-
 ui <- fluidPage(
   withMathJax(),
   titlePanel("Ein Technologiewahlmodell"),

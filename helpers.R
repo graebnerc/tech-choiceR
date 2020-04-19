@@ -33,6 +33,7 @@ adj_n <- function(n_agents, n_techs){
 #' @return An igraph graph
 create_network <- function(n_agents, n_techs, topology){
   n_agents <- adj_n(n_agents, n_techs)
+  all_techs <- factor(1:n_techs)
   if (topology=="Komplettes Netzwerk"){
     network_used <- make_full_graph(
       n_agents, directed = FALSE, loops = FALSE)
