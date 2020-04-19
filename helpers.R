@@ -160,7 +160,10 @@ run_simulation <- function(interaction_id, n_agents, n_techs,
     pivot_longer(cols = -one_of("interaction_id", "time"), 
                  names_to = "tech", values_to = "share")
   
-  return(result_frame)
+  result_list <- list()
+  result_list[["network"]] <- network_used
+  result_list[["data"]] <- result_frame
+  return(result_list)
 }
 
 #' Conducts a number of simulation runs
@@ -184,9 +187,10 @@ run_n_simulations <- function(n_iterations, n_agents, n_techs,
                               network_topology, choose_mode, 
                               intrinsic_preference, intrinsic_utilities){
   result_frames <- list()
+  result_networks <- list()
   for (i in 1:n_iterations){
     print(paste0("Run simulation ", i, "/", n_iterations))
-    result_frames[[as.character(i)]] <- run_simulation(
+     result_list <- run_simulation(
       interaction_id=i, 
       n_agents=n_agents, 
       n_techs=n_techs, 
@@ -194,8 +198,12 @@ run_n_simulations <- function(n_iterations, n_agents, n_techs,
       choose_mode=choose_mode, 
       intrinsic_preference=intrinsic_preference, 
       intrinsic_utilities=intrinsic_utilities)
+     result_frames[[as.character(i)]] <- result_list[["data"]]
+     result_networks[[as.character(i)]] <- result_list[["network"]]
   }
-  return(dplyr::bind_rows(result_frames))
+  final_frame <- dplyr::bind_rows(result_frames)
+  result <- list("data"=final_frame, "networks"=result_networks)
+  return(result)
 }
 
 # Visualization functions------------------------------------------------------
