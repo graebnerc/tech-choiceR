@@ -93,9 +93,6 @@ choose_tech <- function(graph_used, vertex_used, all_techs,
     rel_freqs <- prop.table(abs_freqs)
     if (choice_mode=="share"){
       utilities <- unname(rel_freqs)
-      if (length(utilities)!=length(intrinsic_utilities)){
-        browser()
-      }
       stopifnot(length(utilities)==length(intrinsic_utilities))
       utilities <- utilities + intrinsic_utilities
       utilities[V(graph_used)[vertex_used]$preferred_tech] <- utilities[V(graph_used)[vertex_used]$preferred_tech] + intrinsic_preference
