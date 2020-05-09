@@ -151,7 +151,8 @@ ui <- fluidPage(
            p("1. Welchen Einfluss hat die Netzwerktopologie auf die Tendenz zu technologischen Monopolisierung? Warum?"),
            p("2. Was ist der Einfluss des speziellen Technologienutzens und der gruppenbezogenen Technologiepräferenz?"),
            p("3. Was ist der Effekt der Anzahl der Technologien und Agenten auf die Modell-Dynamik? Ist dieser Effekt Ihrer Ansicht nach intuitiv?"),
-           p("4. Unter welchen Umständen beobachten wir trotz unterschiedlicher Qualität der Technologien keine Monopolisierung? Warum?")
+           p("4. Welchen Unterschied macht es ob für die Berechnung des Netzwerknutzens der Anteil der Technologien an den bisher gewählten Technologien, oder der Anteil der Agenten, die diese Technologie verwenden, herangezogen wird? Welche Annahme ist für welche Situation plausibler?"),
+           p("5. Unter welchen Umständen beobachten wir trotz unterschiedlicher Qualität der Technologien keine Monopolisierung? Warum?")
     )
   )
 )

@@ -1,0 +1,22 @@
+\usepackage{mwe,ragged2e}
+\usepackage[ngerman]{babel}
+\usepackage{lastpage, float}
+\usepackage[top=2cm, bottom=2cm, left=2.0cm, right=2.0cm]{geometry}
+\usepackage[singlespacing]{setspace}
+\usepackage{xcolor,booktabs,array, lastpage} %fancyhdr
+\definecolor{NiceBlue}{RGB}{0, 76, 147}
+\definecolor{NiceRed}{RGB}{255, 26, 26}
+\definecolor{NiceGreen}{RGB}{41, 163, 41}
+\definecolor{NiceYellow}{RGB}{230, 153, 0}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks = true,
+    linkcolor = {NiceBlue},
+    citecolor = {NiceBlue},
+    urlcolor = {NiceBlue}
+    }
+
+\renewcommand\pagemark{{\usekomafont{pagenumber}\thepage\ / \pageref{LastPage}}}
+\usepackage[autooneside]{scrlayer-scrpage}
+\clearpairofpagestyles
+\cfoot{\pagemark}
