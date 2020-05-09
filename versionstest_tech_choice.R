@@ -27,7 +27,8 @@ if (TRUE %in% versionstest){
 
 install.packages(
   c('devtools', 'shiny', 'tidyverse', 'magrittr', 'ggpubr', 
-    'igraph', 'scales', 'Hmisc', 'wesanderson', 'latex2exp')
+    'lattice', 'survival', 'scales', 'igraph', 'Hmisc', 
+    'wesanderson', 'latex2exp')
   )
 
 ggplot_version <- as.character(packageVersion("ggplot2"))
