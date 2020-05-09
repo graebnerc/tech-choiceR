@@ -90,13 +90,17 @@ choose_tech <- function(graph_used, vertex_used, all_techs,
     tech_chosen <- V(graph_used)[vertex_used]$preferred_tech
   } else{
     abs_freqs <- table(techs_neighborhood)
-    rel_freqs <- prop.table(abs_freqs)
     if (choice_mode=="share"){
-      utilities <- unname(rel_freqs)
-      stopifnot(length(utilities)==length(intrinsic_utilities))
-      utilities <- utilities + intrinsic_utilities
-      utilities[V(graph_used)[vertex_used]$preferred_tech] <- utilities[V(graph_used)[vertex_used]$preferred_tech] + intrinsic_preference
+      rel_freqs <- prop.table(abs_freqs)
+    } else if (choice_mode=="absolute"){
+      n_neighbors <- length(neighborhood)
+      rel_freqs <- abs_freqs/n_neighbors
     }
+    utilities <- unname(rel_freqs)
+    stopifnot(length(utilities)==length(intrinsic_utilities))
+    utilities <- utilities + intrinsic_utilities
+    utilities[V(graph_used)[vertex_used]$preferred_tech] <- utilities[V(graph_used)[vertex_used]$preferred_tech] + intrinsic_preference
+    
     index_max <- which(utilities==max(utilities))
     if (length(index_max)>1){
       index_max <- sample(index_max, 1)

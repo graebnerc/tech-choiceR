@@ -12,8 +12,8 @@ source("helpers.R")
 col_blue <- "#004c93"
 col_light_blue <- "#dfe4f2"
 decision_kind_dict <- list(
-  "Anteile"="share",
-  "Absolute Nutzer*innenzahl"="absolute"
+  "Anteile an bereits gewählten Technologien"="share",
+  "Nutzungsanteile bei allen Agenten"="absolute"
 )
 topology_dict <- list(
   "Komplettes Netzwerk"="vollst_netw",
@@ -38,10 +38,11 @@ ui <- fluidPage(
                         value = 2, min = 2, max = 5, step = 1),
            h4("Fallspezifische Einstellungen"),
            selectInput("decision_kind", 
-                       label = "Art der Technologiewahl",
-                       choices = c("Anteile"#, "Absolute Nutzer*innenzahl"
+                       label = "Grundlage für Netzwerknutzen",
+                       choices = c("Anteile an bereits gewählten Technologien", 
+                                   "Nutzungsanteile bei allen Agenten"
                        ),
-                       selected = "Anteile"),
+                       selected = "Anteile an bereits gewählten Technologien"),
            selectInput("network_topology", 
                        label = "Netzwerktopologie",
                        choices = c("Komplettes Netzwerk", 
@@ -132,7 +133,7 @@ ui <- fluidPage(
                "bei wenigen Iterationen die Anzahl nicht ohne Rest durch die", 
                "Anzahl der Technologien teilbar ist (warum?)!")), 
              tags$li("Die Anzahl der Agenten und der Technologien ist selbsterklärend."), 
-             tags$li("Mit der Art der Technologiewahl wird bestimmt, wie der Netzwerknutzen einer Technologie berechnet wird: steigt er gemäß ihres Anteils in der Population oder gemäß der absoluten Nutzer*innenzahlen? Aktuell ist nur die erste Version implementiert."),
+             tags$li("Bei der 'Grundlage des Netzwerknutzens' können Sie auswählen ob bei der Berechnung der relativen Nutzer*innenanteile, die dem Netzwerknutzen zugrunde liegen, nur die Agenten berücksichtigt werden sollen, die schon eine Technologie gewählt haben, oder alle Agenten."),
              tags$li("Über die Netzwerktopologie können Sie bestimmen an welchen anderen Agenten sich ein Agent orientiert wenn sie den Netzwerknutzen der Technologien berechnet. Das gewählte Netzwerk wird in Abbildungen a) und b) angezeigt."), 
              tags$li("Die gruppenbezogene Technologiepräferenz bestimmt wie stark die jeweiligen Gruppen die von ihnen präferierte Technologie den anderen Technologien vorziehen."), 
              tags$li("Der spezielle intrinsische Nutzen einer Technologie ist ein Bonus, der dieser Technologie von jedem Agenten (unabhängig der Gruppenzugehörigkeit) zugeschrieben wird.") 
@@ -172,7 +173,7 @@ server <- function(input, output) {
     } else if (input$network_topology=="Barabasi-Albert"){
       e_col <- adjustcolor("grey", alpha.f = .75)
       plot_layout <- layout.graphopt(network_used)
-    } else if(network_topology_1=="Small-World"){
+    } else if(input$network_topology=="Small-World"){
       e_col <- adjustcolor("grey", alpha.f = .75)
       plot_layout <- layout_in_circle(network_used) 
     }
@@ -198,7 +199,7 @@ server <- function(input, output) {
     } else if (input$network_topology=="Barabasi-Albert"){
       e_col <- adjustcolor("grey", alpha.f = .75)
       plot_layout <- layout.graphopt(network_used)
-    } else if(network_topology_1=="Small-World"){
+    } else if(input$network_topology=="Small-World"){
       e_col <- adjustcolor("grey", alpha.f = .75)
       plot_layout <- layout_in_circle(network_used) 
     }
