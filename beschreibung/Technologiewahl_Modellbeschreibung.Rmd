@@ -22,9 +22,12 @@ knitr::opts_chunk$set(out.height = '75%', out.width = '75%', fig.align = 'center
 Dieses Dokument beschreibt die Grundstruktur von Brian Arthur's
 Technologiewahlmodell.
 Neben der Einführung in das Modell soll dabei auch die Implementierung in R 
-vermittelt werden. 
-Das in diesem Text eingeführte Modell bildet auch die Grundlage für die 
-Shiny-App, welche die Vorlesung ergänzt.
+vermittelt werden, wobei letzteres nur als optionaler Service zu verstehen ist:
+Sie müssen R nicht beherrschen um die App benutzen zu können.
+Für alle die R gelernt haben ist es aber vielleicht interessant und alle anderen
+werden dadurch hoffentlich motiviert diese wunderbare Sprache zu lernen.
+Falls Sie an der Beschreibung der Implementierung nicht interessiert sind können
+Sie Abschnitte 3.2 und 4.3 überspringen.
 
 Die Beschreibung hier ist recht ausführlich. Wem es genügt:
 in der App selbst ist eine Beschreibung der wichtigsten Parameter und ganz 
