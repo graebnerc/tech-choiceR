@@ -155,7 +155,7 @@ Für die vorliegende App habe ich mich entschieden als
 Netzwerknutzen einfach den
 Anteil der relevanten Personen zu nehmen, welche die jeweilige
 Technologie  verwenden. 
-Im einfachsen Falle sind alle Personen in der Population gleich 
+Im einfachsten Falle sind alle Personen in der Population gleich 
 relevant, es gilt also:
 
 $$v(n_i)=\frac{n_i}{n_A+n_B}$$
@@ -175,7 +175,7 @@ Dann gilt für unseren Agenten:
 \begin{align}
 u_A-u_B&=(r_A-r_B)+v(n_A-n_B)\\
 u_A-u_B&=(0.5-0.0) + \frac{2}{2+8} - \frac{8}{2+8}\\
-u_A-u_B&=0.5 + 0.2 - 0.8=-1
+u_A-u_B&=0.5 + 0.2 - 0.8=-0.1
 \end{align}
 
 Entsprechend wird sich die Person - trotz intrinsischer Präferenz
@@ -205,7 +205,7 @@ Zudem legen wir den jeweiligen intrinsischen Nutzen $r_i$ mit
 n_techs <- 2
 all_techs <- factor(1:n_techs)
 intrinsic_utilities <- rep(0.5, n_techs)
-n_agents <- 4
+n_agents <- 6
 agents_id <- 1:n_agents
 ```
 
@@ -262,7 +262,7 @@ ein Vektor der Länge `n_agents`, der ausschließlich fehlende Werte enthält.
 Die Umwandlung des Ergebnis in einen Faktor ist wichtig, damit wir später
 beim Zählen auch die Technologien berücksichtigen, die noch gar nicht gewählt
 wurden. Diese sollen nicht übersprungen werden, sondern sollen explizit den 
-Wert `0`erhalten, da sie zwar existieren, aber von keinem Agenten gewählt 
+Wert `0` erhalten, da sie zwar existieren, aber von keinem Agenten gewählt 
 worden sind.
 
 Im vorliegenden Fall sollte der Agent also einfach seine präferierte Technologie 
