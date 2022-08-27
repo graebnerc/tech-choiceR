@@ -59,7 +59,7 @@ create_network <- function(n_agents, n_techs, topology){
                                   index = V(network_used), NA)
   
   agents_per_group <- n_agents / n_techs
-  groups <- Hmisc::partition.vector(V(network_used), rep(agents_per_group, n_techs))
+  groups <- Hmisc::partition.vector(sample(V(network_used)), rep(agents_per_group, n_techs))
   for (i in 1:length(names(groups))){
     network_used <- set_vertex_attr(network_used, "preferred_tech", 
                                     index = groups[[names(groups)[i]]], 
