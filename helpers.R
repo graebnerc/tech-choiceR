@@ -153,7 +153,7 @@ run_simulation <- function(interaction_id, n_agents, n_techs,
                                intrinsic_utilities = intrinsic_utilities,
                                choice_mode=choose_mode)
     network_used <- set_vertex_attr(
-      network_used, "technology", index = v, value = chosen_tech)
+      network_used, "technology", index = agents_sequence[v], value = chosen_tech)
     current_rel_freqs <- prop.table(table(factor(V(network_used)$technology, 
                                                  levels = levels(all_techs))))
     for (t in all_techs){
